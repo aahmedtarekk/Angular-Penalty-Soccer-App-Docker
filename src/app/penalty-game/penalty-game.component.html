@@ -1,0 +1,33 @@
+<div style="text-align: center; margin-top: 50px;">
+    <h2>Penalty Soccer Game</h2>
+    <p>Choose where to shoot:</p>
+  
+    <select [(ngModel)]="userChoice">
+      <option *ngFor="let option of shootOptions" [value]="option">
+        {{ option }}
+      </option>
+    </select>
+  
+    <button (click)="takeShot()">Take Shot</button>
+  
+    <div *ngIf="result" style="margin-top: 20px;">
+      <h3>{{ result }}</h3>
+    </div>
+  
+    <div style="margin-top: 30px;">
+      <h3>Scoreboard</h3>
+      <p>Goals: {{ goals }}</p>
+      <p>Saves: {{ saves }}</p>
+      <p>Total Shots: {{ totalShots }}</p>
+    </div>
+  
+    <div style="margin-top: 30px;">
+      <h3>Goal Visualizer</h3>
+      <div class="goal-grid">
+        <div *ngFor="let cell of shootOptions" 
+             [ngClass]="{'user-choice': cell === userChoice, 'goalkeeper-choice': cell === goalkeeperChoice}">
+        </div>
+      </div>
+    </div>
+  </div>
+  

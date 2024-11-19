@@ -1,13 +1,14 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { PenaltyGameComponent } from './penalty-game/penalty-game.component';
+import { NgFor, NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-root',
-  standalone: true,
-  imports: [RouterOutlet],
+  standalone: true, // Mark this as a standalone component
+  imports: [NgFor, NgIf, PenaltyGameComponent], // Import dependencies and other components
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+  styleUrls: ['./app.component.css'],
 })
 export class AppComponent {
-  title = 'my-angular-app';
+  title = 'Penalty Soccer Game';
 }
