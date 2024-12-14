@@ -33,6 +33,18 @@ pipeline {
                 }
             }
         }
+      
+        stage('Health Check') {
+            steps {
+                script {
+                    // Wait for the container to start
+                    sleep 5
+
+                    // Check if the container is responding
+                    sh "curl http://localhost:${HOST_PORT} || exit 1"
+                }
+            }
+        }
 
         stage('Push to DockerHub') {
             steps {
