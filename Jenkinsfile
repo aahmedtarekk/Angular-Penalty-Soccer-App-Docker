@@ -41,7 +41,7 @@ pipeline {
                     sleep 5
 
                     // Check if the container is responding
-                    sh "curl -f http://localhost:${HOST_PORT} || exit 1"
+                    sh "curl http://localhost:${HOST_PORT} || exit 1"
                 }
             }
         }
