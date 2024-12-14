@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = "ahmedtarekk/AngularSoccerGitJenkins:latest"
+        DOCKER_IMAGE = "ahmedtarekk/angular-soccer-git-jenkins:latest"
         CONTAINER_PORT = "3001" // Replace with your desired port
         HOST_PORT = "3000" // Replace with the same port or map to another host port
     }
