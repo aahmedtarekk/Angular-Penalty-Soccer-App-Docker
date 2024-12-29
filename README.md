@@ -1,27 +1,10 @@
-# MyAngularApp
+This project is aiming to do the following: 
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 18.2.12.
+  1. Building an image using:                   docker build -t IMAGE_NAME
+  2. Running a container from that image using: docker run -d --name test container -p HOST_PORT:CONTAINER_PORT IMAGE_NAME
+  3. Testing the container content using:       curl localhost:HOST_PORT
+  4. Pushing the image to dockerhub using:      echo docker_password | docker login -u docker-username (via credentials).
+  5. If any of that stages have failed, the rest of the stages won't proceed.
 
-## Development server
-
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
-
-## Code scaffolding
-
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
-
-## Build
-
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
-
-## Running unit tests
-
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+ I have added the Jenkins user to the Docker user group in order for Jenkins to use the docker commands, then did systemctl       command reset the configs of docker and jenkins.
+ I have added the credentials of GitHub and Dockerhub to the general credentials of jenkins in order so that Jenkins can use      them later on while logging into the dockerhub and accessing the repository on GitHub.
