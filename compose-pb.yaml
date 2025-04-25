@@ -1,0 +1,15 @@
+- name: Run docker-compose manually using ansible
+  hosts: node1
+  become: true
+  vars:
+    compose_dir: /home/ansible/ansible-playbook/docker-compose/
+  tasks:
+    - name: Copy docker-compose.yaml
+      copy:
+        src: docker-compose.yaml
+        dest: "{{ compose_dir }}/docker-compose.yaml"
+
+    - name: Run docker compose up -d
+      command: docker compose up -d
+      args:
+        chdir: "{{ compose_dir }}"
