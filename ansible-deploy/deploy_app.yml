@@ -1,0 +1,37 @@
+---
+- name: Deploy Angular app using Docker
+  hosts: localhost
+  become: true
+  tasks:
+    - name: Ensure Docker is installed
+      apt:
+        name: docker.io
+        state: present
+        update_cache: yes
+
+    - name: Build Docker image
+      command: docker build -t {{ docker_image }} .
+      args:
+        chdir: /path/to/your/repo
+
+    - name: Run Docker container
+      docker_container:
+        name: test-container
+        image: "{{ docker_image }}"
+        state: started
+        restart_policy: always
+        ports:
+          - "3001:80"
+        exposed_ports:
+          - "80"
+        detach: yes
+      register: container_status
+
+    - name: Check if container is running
+      command: docker ps -q -f name=test-container
+      register: container_running
+      failed_when: container_running.stdout == ""
+
+    - name: Print status of the container
+      debug:
+        var: container_status
