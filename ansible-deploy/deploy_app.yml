@@ -1,17 +1,19 @@
 ---
 - name: Deploy Angular app using Docker
   hosts: all
-  become: yes
+  become: true
   tasks:
+    - name: Remove any conflicting Docker repository entries
+      command: "sudo rm -f /etc/apt/sources.list.d/docker.list"
+      ignore_errors: true
 
     - name: Remove conflicting containerd packages (if installed)
       apt:
         name:
-          - containerd
           - containerd.io
+          - containerd
         state: absent
-        force: yes
-      when: ansible_facts.packages['containerd'] is defined or ansible_facts.packages['containerd.io'] is defined
+      ignore_errors: true
 
     - name: Ensure Docker dependencies are installed
       apt:
@@ -23,45 +25,36 @@
         state: present
 
     - name: Add Docker's official GPG key
-      shell: curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo tee /etc/apt/trusted.gpg.d/docker.asc
-      args:
-        creates: /etc/apt/trusted.gpg.d/docker.asc
+      get_url:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        dest: /usr/share/keyrings/docker-archive-keyring.gpg
+        mode: '0644'
 
     - name: Add Docker's official repository
       apt_repository:
-        repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release | lower }} stable"
+        repo: "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu {{ ansible_lsb.codename }} stable"
         state: present
+        filename: "docker"
 
     - name: Update apt package index
       apt:
         update_cache: yes
 
-    - name: Install Docker
+    - name: Install Docker and dependencies
       apt:
-        name: docker-ce
-        state: latest
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+        state: present
 
-    - name: Start and enable Docker service
-      service:
+    - name: Ensure Docker service is enabled and started
+      systemd:
         name: docker
         state: started
-        enabled: yes
+        enabled: true
 
-    - name: Verify Docker installation
-      command: docker --version
-      register: docker_version
-      changed_when: false
-
-    - name: Show Docker version
-      debug:
-        var: docker_version.stdout
-
-    # Your additional deployment steps here
-    - name: Deploy the Angular App
-      docker_container:
-        name: my-angular-app
-        image: "{{ docker_image }}"
-        state: started
-        restart_policy: always
-        ports:
-          - "80:80"
+    - name: Install Ansible (if needed)
+      apt:
+        name: ansible
+        state: present
