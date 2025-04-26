@@ -1,37 +1,67 @@
 ---
 - name: Deploy Angular app using Docker
-  hosts: localhost
-  become: true
+  hosts: all
+  become: yes
   tasks:
-    - name: Ensure Docker is installed
+
+    - name: Remove conflicting containerd packages (if installed)
       apt:
-        name: docker.io
+        name:
+          - containerd
+          - containerd.io
+        state: absent
+        force: yes
+      when: ansible_facts.packages['containerd'] is defined or ansible_facts.packages['containerd.io'] is defined
+
+    - name: Ensure Docker dependencies are installed
+      apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - software-properties-common
         state: present
+
+    - name: Add Docker's official GPG key
+      shell: curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo tee /etc/apt/trusted.gpg.d/docker.asc
+      args:
+        creates: /etc/apt/trusted.gpg.d/docker.asc
+
+    - name: Add Docker's official repository
+      apt_repository:
+        repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release | lower }} stable"
+        state: present
+
+    - name: Update apt package index
+      apt:
         update_cache: yes
 
-    - name: Build Docker image
-      command: docker build -t {{ docker_image }} .
-      args:
-        chdir: /path/to/your/repo
+    - name: Install Docker
+      apt:
+        name: docker-ce
+        state: latest
 
-    - name: Run Docker container
+    - name: Start and enable Docker service
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Verify Docker installation
+      command: docker --version
+      register: docker_version
+      changed_when: false
+
+    - name: Show Docker version
+      debug:
+        var: docker_version.stdout
+
+    # Your additional deployment steps here
+    - name: Deploy the Angular App
       docker_container:
-        name: test-container
+        name: my-angular-app
         image: "{{ docker_image }}"
         state: started
         restart_policy: always
         ports:
-          - "3001:80"
-        exposed_ports:
-          - "80"
-        detach: yes
-      register: container_status
-
-    - name: Check if container is running
-      command: docker ps -q -f name=test-container
-      register: container_running
-      failed_when: container_running.stdout == ""
-
-    - name: Print status of the container
-      debug:
-        var: container_status
+          - "80:80"
