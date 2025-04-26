@@ -1,119 +1,112 @@
-⚽ Soccer Penalty Demo Game Deployment
+⚽ Soccer Penalty Demo Game – CI/CD Pipeline
 📜 Project Overview
-This project demonstrates a Soccer Penalty Demo Game, developed in Angular, dockerized, and fully automated using a CI/CD pipeline with Jenkins, DockerHub, Ansible, and AWS EC2.
+This project demonstrates a complete DevOps pipeline for a Soccer Penalty Demo Game developed with Angular.
+The application is dockerized, automatically built and tested with Jenkins, deployed via Ansible, and hosted on an AWS EC2 instance.
+We also integrated Prometheus and Grafana for monitoring.
 
 🛠 Technology Stack
 Angular (Frontend Application)
 
 Docker (Containerization)
 
-Jenkins (CI/CD Pipeline)
+Jenkins (CI/CD Automation)
 
-DockerHub (Container Registry)
+DockerHub (Image Registry)
 
-Ansible (Automation & Deployment)
+Ansible (Deployment Automation)
 
-AWS EC2 Instance (Hosting the entire deployment)
+AWS EC2 Instance (Production Hosting)
+
+Prometheus (Metrics Monitoring)
+
+Grafana (Visualization Dashboard)
 
 🚀 Project Workflow
-Application Development
+Source Code Management
 
-The game is developed using Angular.
+Application source code (including Dockerfile and Jenkinsfile) is maintained in a GitHub repository.
 
-Dockerization
+Continuous Integration with Jenkins
 
-A Dockerfile is created to containerize the Angular application.
+Jenkins pulls the latest code.
 
-Source Control
+Jenkins builds a Docker image using the Dockerfile.
 
-All files (Dockerfile, Jenkinsfile, application code) are pushed to a Git repository.
+A temporary container is spun up to test the image.
 
-Continuous Integration via Jenkins
+If the test is successful, Jenkins pushes the image to DockerHub.
 
-Jenkins pipeline (Jenkinsfile) is triggered when changes are pushed.
+Jenkins triggers an Ansible Playbook for deployment.
 
-Jenkins stages:
+Continuous Deployment with Ansible
 
-Build the Docker image.
+Ansible playbook ensures Docker is properly installed on the EC2 instance.
 
-Run a temporary container to test the image.
+It builds (or pulls) the Docker image.
 
-On successful test, push the image to DockerHub using saved credentials.
+It runs the Docker container and exposes the application on port 3001.
 
-Continuous Deployment via Ansible
+Production Hosting
 
-After pushing the image, Jenkins triggers an Ansible Playbook to deploy the app.
+The final running container hosts the Angular app on an AWS EC2 instance.
 
-Ansible Tasks:
+Monitoring
 
-Ensure Docker is properly installed and configured on the target server.
+Prometheus scrapes system metrics via Node Exporter.
 
-Build the Docker image (optional if pulling).
+Grafana visualizes these metrics into real-time dashboards.
 
-Run the Docker container from the newly pushed image.
+📂 Ansible Playbook Details
+The Ansible playbook:
 
-Expose the application on port 3001.
+Removes old Docker packages and sources.
 
-Production Deployment
+Installs Docker CE and all dependencies.
 
-The full application is deployed on an AWS EC2 Instance.
+Builds the Docker image from the Jenkins workspace.
 
-The app is accessible via the EC2 instance’s public IP at port 3001.
+Runs a Docker container (test-container) mapping port 3001 to 80 internally.
 
-📂 Ansible Playbook Overview
-The Ansible playbook automates the deployment:
+Ensures the container is started and healthy.
 
-Remove old Docker sources and packages.
-
-Install the correct Docker CE version.
-
-Build the Docker image (optional based on workspace).
-
-Run a container using the image from DockerHub.
-
-Expose the application internally and externally on the EC2 instance.
-
-Main roles handled by Ansible:
-
-System cleanup
-
-Docker installation
-
-Docker image build/run
-
-Health checking for the running container
-
-🌐 Accessing the Application
+🌐 How to Access the Application
 After deployment:
 
 Open your browser.
 
-Visit: http://<EC2-Public-IP>:3001
+Visit:
+http://<Your-EC2-Public-IP>:3001
 
-You will see the Soccer Penalty Demo Game running!
+Enjoy the Soccer Penalty Demo Game!
 
-🖼️ System Architecture Diagram
-pgsql
+📊 Monitoring with Prometheus and Grafana
+Prometheus collects metrics like CPU, Memory, Disk, and Network usage from the EC2 instance using Node Exporter.
+
+Grafana visualizes these metrics into clean, interactive dashboards.
+
+🖼️ Architecture Diagram
+scss
 Copy
 Edit
-[Git Repo]
-    |
-    v
-[Jenkins Server]
-    |
-    |--- (Build Image + Push to DockerHub)
-    v
+[GitHub Repo]
+      ↓
+[Jenkins CI/CD Server]
+      ↓
+(Build Image → Test Container → Push Image → Trigger Ansible)
+      ↓
 [Ansible Playbook on EC2]
-    |
-    |--- (Deploy Docker Container)
-    v
-[Soccer Penalty Game Running on EC2 Instance]
-🔐 Notes
-EC2 Security Groups must allow port 3001 inbound.
+      ↓
+(Docker Container Runs Angular App)
+      ↓
+[Prometheus + Grafana Monitoring]
+🛡️ Final Notes
+EC2 Security Group allows inbound traffic on port 3001.
 
-DockerHub credentials are securely handled inside Jenkins.
+DockerHub credentials are securely managed inside Jenkins.
 
-The deployment is fully automated — from code push to live running application!
+The entire flow from code commit to live deployment is fully automated.
+
+Prometheus and Grafana are deployed for real-time server and application health monitoring.
 
 🎯 Conclusion
-This project shows a complete DevOps pipeline in action: Code ➔ Build ➔ Test ➔ Push ➔ Deploy, all hosted in a real-world AWS EC2 environment.
+This project showcases an end-to-end CI/CD DevOps pipeline integrated with monitoring, all running on a real AWS EC2 instance — providing a hands-on, production-like environment.
