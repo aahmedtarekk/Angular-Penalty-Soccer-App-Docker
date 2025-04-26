@@ -27,6 +27,8 @@ Source Code Management
 Application source code (including Dockerfile and Jenkinsfile) is maintained in a GitHub repository.
 
 Continuous Integration with Jenkins
+![image](https://github.com/user-attachments/assets/fdaa23c4-c329-4db8-9732-5170d5b56164)
+
 
 Jenkins pulls the latest code.
 
@@ -53,8 +55,11 @@ The final running container hosts the Angular app on an AWS EC2 instance.
 Monitoring
 
 Prometheus scrapes system metrics via Node Exporter.
+![WhatsApp Image 2025-04-26 at 13 24 57_cce5e2f1](https://github.com/user-attachments/assets/cf4c4d3d-d8bf-44df-85fd-4b5b5b043e89)
 
 Grafana visualizes these metrics into real-time dashboards.
+![WhatsApp Image 2025-04-26 at 13 24 55_e5a5f195](https://github.com/user-attachments/assets/fc3ae383-3660-429a-a627-e3ae740c7a57)
+
 
 📂 Ansible Playbook Details
 The Ansible playbook:
@@ -101,6 +106,8 @@ Edit
 [Prometheus + Grafana Monitoring]
 🛡️ Final Notes
 EC2 Security Group allows inbound traffic on port 3001.
+![WhatsApp Image 2025-04-26 at 13 16 30_57c0e173](https://github.com/user-attachments/assets/a9369a91-dee7-42b5-b025-6dd3b38b3266)
+
 
 DockerHub credentials are securely managed inside Jenkins.
 
