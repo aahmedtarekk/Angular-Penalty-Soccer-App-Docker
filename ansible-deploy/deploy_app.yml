@@ -1,13 +1,21 @@
----
 - name: Deploy Angular app using Docker
   hosts: localhost
   become: true
   tasks:
+    - name: Remove broken Docker APT source if it exists
+      file:
+        path: /etc/apt/sources.list.d/docker.list
+        state: absent
+
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
     - name: Ensure Docker is installed
       apt:
         name: docker.io
         state: present
-        update_cache: yes
 
     - name: Build Docker image
       command: docker build -t {{ docker_image }} .
