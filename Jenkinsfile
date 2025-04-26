@@ -1,10 +1,12 @@
 pipeline {
     agent any
+
     environment {
         DOCKER_IMAGE = "ahmedtarekk/angular-soccer-depi-git-jenkins:latest"
         CONTAINER_PORT = "80"
         HOST_PORT = "3001"
     }
+
     stages {
         stage('Checkout') {
             steps {
@@ -31,6 +33,8 @@ pipeline {
                 }
             }
         }
+
+        stage('Push to DockerHub') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials1', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
                     script {
