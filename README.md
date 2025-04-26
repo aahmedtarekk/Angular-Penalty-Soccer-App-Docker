@@ -1,49 +1,119 @@
-# ⚽ Soccer Penalty Demo Game
+⚽ Soccer Penalty Demo Game Deployment
+📜 Project Overview
+This project demonstrates a Soccer Penalty Demo Game, developed in Angular, dockerized, and fully automated using a CI/CD pipeline with Jenkins, DockerHub, Ansible, and AWS EC2.
 
-This project is a **Soccer Penalty Game** built with **Angular**, packaged using **Docker**, and deployed using a full **CI/CD pipeline** powered by **Jenkins** and **Ansible**.
+🛠 Technology Stack
+Angular (Frontend Application)
 
----
+Docker (Containerization)
 
-## 📦 Tech Stack
+Jenkins (CI/CD Pipeline)
 
-- **Frontend**: Angular
-- **CI/CD**: Jenkins
-- **Containerization**: Docker
-- **Image Registry**: Docker Hub
-- **Deployment Automation**: Ansible
+DockerHub (Container Registry)
 
----
+Ansible (Automation & Deployment)
 
-## 🚀 Project Workflow Overview
+AWS EC2 Instance (Hosting the entire deployment)
 
-### 1. **Development**
-- The game is developed using Angular and resides in this Git repository.
-- Includes a `Dockerfile` to build the Angular app into a lightweight production image.
+🚀 Project Workflow
+Application Development
 
-### 2. **Dockerization**
-- The Angular application is dockerized using a production-ready `Dockerfile`.
-- The resulting image contains a fully packaged Angular app served via NGINX.
+The game is developed using Angular.
 
-### 3. **CI/CD Pipeline (Jenkins)**
-- A `Jenkinsfile` automates the entire lifecycle:
-  - ✅ **Builds Docker Image**
-  - ✅ **Runs a temporary container for testing**
-  - ✅ **Pushes the tested image to Docker Hub**
-  - ✅ **Cleans up any test containers**
-  - ✅ **Triggers Ansible playbook for final deployment**
+Dockerization
 
-### 4. **Image Registry**
-- Docker images are securely pushed to [Docker Hub](https://hub.docker.com/) using Jenkins credentials.
+A Dockerfile is created to containerize the Angular application.
 
-### 5. **Deployment with Ansible**
-- An Ansible Playbook automates the deployment process:
-  - ✅ Removes any broken or old Docker installations
-  - ✅ Installs and configures Docker CE from the official Docker repositories
-  - ✅ Builds the Docker image again locally (to ensure consistency)
-  - ✅ Runs the container, mapping the Angular app to port `3001`
-  - ✅ Ensures the container runs detached and always restarts on failure
+Source Control
 
----
+All files (Dockerfile, Jenkinsfile, application code) are pushed to a Git repository.
 
-## 📁 Repository Structure
+Continuous Integration via Jenkins
 
+Jenkins pipeline (Jenkinsfile) is triggered when changes are pushed.
+
+Jenkins stages:
+
+Build the Docker image.
+
+Run a temporary container to test the image.
+
+On successful test, push the image to DockerHub using saved credentials.
+
+Continuous Deployment via Ansible
+
+After pushing the image, Jenkins triggers an Ansible Playbook to deploy the app.
+
+Ansible Tasks:
+
+Ensure Docker is properly installed and configured on the target server.
+
+Build the Docker image (optional if pulling).
+
+Run the Docker container from the newly pushed image.
+
+Expose the application on port 3001.
+
+Production Deployment
+
+The full application is deployed on an AWS EC2 Instance.
+
+The app is accessible via the EC2 instance’s public IP at port 3001.
+
+📂 Ansible Playbook Overview
+The Ansible playbook automates the deployment:
+
+Remove old Docker sources and packages.
+
+Install the correct Docker CE version.
+
+Build the Docker image (optional based on workspace).
+
+Run a container using the image from DockerHub.
+
+Expose the application internally and externally on the EC2 instance.
+
+Main roles handled by Ansible:
+
+System cleanup
+
+Docker installation
+
+Docker image build/run
+
+Health checking for the running container
+
+🌐 Accessing the Application
+After deployment:
+
+Open your browser.
+
+Visit: http://<EC2-Public-IP>:3001
+
+You will see the Soccer Penalty Demo Game running!
+
+🖼️ System Architecture Diagram
+pgsql
+Copy
+Edit
+[Git Repo]
+    |
+    v
+[Jenkins Server]
+    |
+    |--- (Build Image + Push to DockerHub)
+    v
+[Ansible Playbook on EC2]
+    |
+    |--- (Deploy Docker Container)
+    v
+[Soccer Penalty Game Running on EC2 Instance]
+🔐 Notes
+EC2 Security Groups must allow port 3001 inbound.
+
+DockerHub credentials are securely handled inside Jenkins.
+
+The deployment is fully automated — from code push to live running application!
+
+🎯 Conclusion
+This project shows a complete DevOps pipeline in action: Code ➔ Build ➔ Test ➔ Push ➔ Deploy, all hosted in a real-world AWS EC2 environment.
