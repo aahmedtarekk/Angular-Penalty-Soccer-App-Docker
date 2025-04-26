@@ -48,15 +48,17 @@ pipeline {
         stage('Install Ansible') {
             steps {
                 script {
-                    sh '''
-                        if ! command -v ansible &> /dev/null; then
+                    def ansibleInstalled = sh(script: 'command -v ansible', returnStatus: true) == 0
+                    if (!ansibleInstalled) {
+                        sh '''
                             echo "Installing Ansible..."
-                            sudo apt update
-                            sudo apt install -y ansible
-                        else
-                            echo "Ansible is already installed."
-                        fi
-                    '''
+                            sudo rm -f /etc/apt/sources.list.d/docker.list || true
+                            sudo apt-get update
+                            sudo apt-get install -y ansible
+                        '''
+                    } else {
+                        echo "Ansible is already installed."
+                    }
                 }
             }
         }
