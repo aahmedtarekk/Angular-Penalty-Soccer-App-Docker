@@ -1,60 +1,37 @@
 ---
 - name: Deploy Angular app using Docker
-  hosts: all
+  hosts: localhost
   become: true
   tasks:
-    - name: Remove any conflicting Docker repository entries
-      command: "sudo rm -f /etc/apt/sources.list.d/docker.list"
-      ignore_errors: true
-
-    - name: Remove conflicting containerd packages (if installed)
+    - name: Ensure Docker is installed
       apt:
-        name:
-          - containerd.io
-          - containerd
-        state: absent
-      ignore_errors: true
-
-    - name: Ensure Docker dependencies are installed
-      apt:
-        name:
-          - apt-transport-https
-          - ca-certificates
-          - curl
-          - software-properties-common
+        name: docker.io
         state: present
-
-    - name: Add Docker's official GPG key
-      get_url:
-        url: https://download.docker.com/linux/ubuntu/gpg
-        dest: /usr/share/keyrings/docker-archive-keyring.gpg
-        mode: '0644'
-
-    - name: Add Docker's official repository
-      apt_repository:
-        repo: "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu {{ ansible_lsb.codename }} stable"
-        state: present
-        filename: "docker"
-
-    - name: Update apt package index
-      apt:
         update_cache: yes
 
-    - name: Install Docker and dependencies
-      apt:
-        name:
-          - docker-ce
-          - docker-ce-cli
-          - containerd.io
-        state: present
+    - name: Build Docker image
+      command: docker build -t {{ docker_image }} .
+      args:
+        chdir: /path/to/your/repo
 
-    - name: Ensure Docker service is enabled and started
-      systemd:
-        name: docker
+    - name: Run Docker container
+      docker_container:
+        name: test-container
+        image: "{{ docker_image }}"
         state: started
-        enabled: true
+        restart_policy: always
+        ports:
+          - "3001:80"
+        exposed_ports:
+          - "80"
+        detach: yes
+      register: container_status
 
-    - name: Install Ansible (if needed)
-      apt:
-        name: ansible
-        state: present
+    - name: Check if container is running
+      command: docker ps -q -f name=test-container
+      register: container_running
+      failed_when: container_running.stdout == ""
+
+    - name: Print status of the container
+      debug:
+        var: container_status
