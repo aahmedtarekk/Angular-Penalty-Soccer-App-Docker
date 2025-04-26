@@ -66,7 +66,9 @@ pipeline {
         stage('Deploy with Ansible') {
             steps {
                 script {
-                    sh 'ansible-playbook -i ansible-deploy/inventory.ini ansible-deploy/deploy_app.yml'
+                    withEnv(["ANSIBLE_WORKSPACE=${env.WORKSPACE}", "DOCKER_IMAGE=${DOCKER_IMAGE}"]) {
+                        sh 'ansible-playbook -i ansible-deploy/inventory.ini ansible-deploy/deploy_app.yml'
+                    }
                 }
             }
         }
