@@ -17,23 +17,28 @@ pipeline {
         stage('Install Docker and Ansible') {
             steps {
                 script {
-                    // Purge any conflicting packages
-                    sh 'sudo apt-get remove --purge -y containerd.io containerd || true'
-                    sh 'sudo apt-get autoremove -y || true'
-        
+                    // Remove any conflicting packages or previous Docker GPG keys
+                    sh '''
+                        sudo apt-get remove --purge -y containerd.io containerd || true
+                        sudo apt-get autoremove -y || true
+                        sudo rm -f /usr/share/keyrings/docker-archive-keyring.gpg
+                    '''
+                    
                     // Update package list
                     sh 'sudo apt-get update'
-        
-                    // Install Docker
-                    sh 'sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common'
-                    sh 'curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg'
-                    sh 'echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null'
-                    sh 'sudo apt-get update'
-                    sh 'sudo apt-get install -y docker-ce docker-ce-cli containerd.io'
-        
+                    
+                    // Install Docker dependencies
+                    sh '''
+                        sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
+                        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo tee /usr/share/keyrings/docker-archive-keyring.gpg
+                        echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+                        sudo apt-get update
+                        sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+                    '''
+                    
                     // Ensure Docker service is running
                     sh 'sudo systemctl enable docker && sudo systemctl start docker'
-        
+
                     // Install Ansible
                     sh 'sudo apt-get install -y ansible'
                 }
@@ -59,7 +64,7 @@ pipeline {
                 }
             }
         }
-      
+
         stage('Health Check') {
             steps {
                 script {
@@ -98,17 +103,10 @@ pipeline {
 
     post {
         always {
-            echo "Cleaning up test container"
             // Clean up the test container
             script {
                 sh "docker rm -f test-container || true"
             }
-        }
-        success {
-            echo 'Pipeline completed successfully.'
-        }
-        failure {
-            echo 'Pipeline failed.'
         }
     }
 }
